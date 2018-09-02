@@ -34,7 +34,7 @@ Flag dev {
 }
 
 
-Executable elm
+library 
     if flag(dev)
         ghc-options: -O0 -Wall -Werror
     else
@@ -48,23 +48,7 @@ Executable elm
     other-extensions:
         TemplateHaskell
 
-    Main-Is:
-        Main.hs
-
-    other-modules:
-        Bump
-        Develop
-        Develop.Generate.Help
-        Develop.Generate.Index
-        Develop.StaticFiles
-        Develop.StaticFiles.Build
-        Diff
-        Init
-        Install
-        Make
-        Publish
-        Repl
-
+    exposed-modules:
         -- terminal args
         Terminal.Args
         Terminal.Args.Chomp
