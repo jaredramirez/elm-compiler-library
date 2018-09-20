@@ -1,6 +1,9 @@
 module File.Compile
   ( compile
   , Answer(..)
+  , isBlocked
+  , toDocsFlag
+  , makeImports
   )
   where
 
