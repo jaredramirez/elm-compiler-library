@@ -2,6 +2,7 @@
 module Reporting.Task
   ( Task, Task_
   , try
+  , tryWithError
   , run
   , throw
   , mapError
@@ -61,20 +62,24 @@ data Env =
 
 
 try :: Progress.Reporter -> Task a -> IO (Maybe a)
-try (Progress.Reporter tell ask end) task =
+try reporter@(Progress.Reporter tell ask end) task =
+  do  result <- tryWithError reporter task
+      case result of
+        Left error ->
+          do  end (Just error)
+              return Nothing
+        
+        Right answer ->
+          do  end Nothing
+              return (Just answer)
+
+tryWithError :: Progress.Reporter -> Task a -> IO (Either Exit.Exit a)
+tryWithError (Progress.Reporter tell ask end) task =
   do  root <- PerUserCache.getPackageRoot
       pool <- initPool 4
       httpManager <- Http.newManager Http.tlsManagerSettings
       let env = Env root pool httpManager tell ask
-      result <- R.runReaderT (runExceptT task) env
-      case result of
-        Left err ->
-          do  end (Just err)
-              return Nothing
-
-        Right answer ->
-          do  end Nothing
-              return (Just answer)
+      R.runReaderT (runExceptT task) env
 
 
 run :: Progress.Reporter -> Task a -> IO ()
