@@ -75,7 +75,7 @@ solve :: Env -> Int -> Pools -> State -> Constraint -> IO State
 solve env rank pools state constraint =
   case constraint of
     CTrue ->
-      return state
+      return (state { _env = env })
 
     CSaveTheEnvironment ->
       return (state { _env = env })
